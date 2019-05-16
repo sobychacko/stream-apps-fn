@@ -39,7 +39,8 @@ public class RabbitSinkConfiguration implements DisposableBean {
 	private CachingConnectionFactory ownConnectionFactory;
 
 	@Bean
-	public MessageHandler amqpChannelAdapter(ConnectionFactory rabbitConnectionFactory) throws Exception {
+		public MessageHandler amqpChannelAdapter(ConnectionFactory rabbitConnectionFactory) throws Exception {
+		System.out.println("In amqpChannelAdapter - FOOBAR-1");
 		AmqpOutboundEndpointSpec handler = Amqp.outboundAdapter(rabbitTemplate(this.properties.isOwnConnection()
 				? buildLocalConnectionFactory()
 				: rabbitConnectionFactory))
@@ -63,7 +64,7 @@ public class RabbitSinkConfiguration implements DisposableBean {
 		else {
 			handler.routingKey(this.properties.getRoutingKey());
 		}
-
+		System.out.println("In amqpChannelAdapter - FOOBAR-2");
 		return handler.get();
 	}
 
@@ -75,6 +76,7 @@ public class RabbitSinkConfiguration implements DisposableBean {
 
 	@Bean
 	public RabbitTemplate rabbitTemplate(ConnectionFactory rabbitConnectionFactory) {
+		System.out.println("IN RABBIT TEMPLATE...");
 		RabbitTemplate rabbitTemplate = new RabbitTemplate(rabbitConnectionFactory);
 		if (this.messageConverter != null) {
 			rabbitTemplate.setMessageConverter(this.messageConverter);
