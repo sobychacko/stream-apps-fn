@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package jdbc.supplier;
+package jdbc.source;
 
 import javax.validation.constraints.NotNull;
 

@@ -1,4 +1,4 @@
-package jdbc.supplier;
+package jdbc.source;
 
 import javax.sql.DataSource;
 

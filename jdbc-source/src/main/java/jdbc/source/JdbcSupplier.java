@@ -1,4 +1,4 @@
-package jdbc.supplier;
+package jdbc.source;
 
 import java.util.function.Supplier;
 

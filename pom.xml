@@ -13,6 +13,7 @@
 	</properties>
 
   	<modules>
-		<module>jdbc-supplier</module>
+		<module>jdbc-source</module>
+		<module>rabbit-sink</module>
 	</modules>
 </project>
