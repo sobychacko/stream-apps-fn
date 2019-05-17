@@ -18,13 +18,12 @@ public class RabbitSink {
 	private MessageHandler messageHandler;
 
 	@Bean
-	public Function<String, String> sink() {
+	public Function<Object, Object> sink() {
 		return o -> {
 			System.out.println("Got the message: " + o);
 			System.out.println("Got:" + this.messageHandler.getClass().getName());
-			System.out.println("Got::" + this.messageHandler.getClass().getCanonicalName());
 			this.messageHandler.handleMessage(MessageBuilder.withPayload(o).build());
-			return "Message sent to rabbitmq";
+			return "Message sent to rabbitmq - check the exchange...";
 		};
 	}
 
