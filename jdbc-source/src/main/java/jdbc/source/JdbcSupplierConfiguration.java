@@ -27,9 +27,4 @@ public class JdbcSupplierConfiguration {
 		jdbcPollingChannelAdapter.setUpdateSql(this.properties.getUpdate());
 		return jdbcPollingChannelAdapter;
 	}
-
-	@Bean
-	public JdbcSupplier jdbcSupplier(MessageSource messageSource) {
-		return new JdbcSupplier(messageSource);
-	}
 }

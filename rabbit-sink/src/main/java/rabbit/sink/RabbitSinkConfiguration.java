@@ -39,7 +39,7 @@ public class RabbitSinkConfiguration implements DisposableBean {
 	private CachingConnectionFactory ownConnectionFactory;
 
 	@Bean
-		public MessageHandler amqpChannelAdapter(ConnectionFactory rabbitConnectionFactory) throws Exception {
+	public MessageHandler amqpChannelAdapter(ConnectionFactory rabbitConnectionFactory) throws Exception {
 		System.out.println("In amqpChannelAdapter - FOOBAR-1");
 		AmqpOutboundEndpointSpec handler = Amqp.outboundAdapter(rabbitTemplate(this.properties.isOwnConnection()
 				? buildLocalConnectionFactory()
