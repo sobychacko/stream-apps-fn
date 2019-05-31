@@ -1,5 +1,7 @@
 package rabbit.sink;
 
+import java.util.function.Function;
+
 import org.springframework.amqp.core.MessageDeliveryMode;
 import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
@@ -10,18 +12,24 @@ import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.AutoConfigureBefore;
 import org.springframework.boot.autoconfigure.amqp.RabbitAutoConfiguration;
 import org.springframework.boot.autoconfigure.amqp.RabbitProperties;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.expression.Expression;
 import org.springframework.integration.amqp.dsl.Amqp;
 import org.springframework.integration.amqp.dsl.AmqpOutboundEndpointSpec;
+import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageHandler;
 
 @EnableConfigurationProperties(RabbitSinkProperties.class)
+@Configuration
+@AutoConfigureBefore(RabbitAutoConfiguration.class)
 public class RabbitSinkConfiguration implements DisposableBean {
 
 	@Autowired
@@ -37,6 +45,16 @@ public class RabbitSinkConfiguration implements DisposableBean {
 	private MessageConverter messageConverter;
 
 	private CachingConnectionFactory ownConnectionFactory;
+
+	@Bean
+	public Function<Message<?>, Object> sink(@Qualifier("amqpChannelAdapter") MessageHandler messageHandler) {
+		return o -> {
+			System.out.println("Got the message: " + o);
+			System.out.println("Got:" + messageHandler.getClass().getName());
+			messageHandler.handleMessage(o);
+			return "Message sent to rabbitmq - check the exchange...";
+		};
+	}
 
 	@Bean
 	public MessageHandler amqpChannelAdapter(ConnectionFactory rabbitConnectionFactory) throws Exception {

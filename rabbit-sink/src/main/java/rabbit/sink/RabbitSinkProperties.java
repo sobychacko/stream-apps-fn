@@ -1,5 +1,7 @@
 package rabbit.sink;
 
+import javax.validation.constraints.AssertTrue;
+
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.expression.Expression;
 import org.springframework.validation.annotation.Validated;
@@ -108,7 +110,7 @@ public class RabbitSinkProperties {
 		this.converterBeanName = converterBeanName;
 	}
 
-	//@AssertTrue(message = "routingKey or routingKeyExpression is required")
+	@AssertTrue(message = "routingKey or routingKeyExpression is required")
 	public boolean isRoutingKeyProvided() {
 		return this.routingKey != null || this.routingKeyExpression != null;
 	}
