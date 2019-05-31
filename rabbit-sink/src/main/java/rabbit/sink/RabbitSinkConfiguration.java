@@ -1,7 +1,5 @@
 package rabbit.sink;
 
-import java.util.function.Function;
-
 import org.springframework.amqp.core.MessageDeliveryMode;
 import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
@@ -12,9 +10,7 @@ import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.AutoConfigureBefore;
 import org.springframework.boot.autoconfigure.amqp.RabbitAutoConfiguration;
 import org.springframework.boot.autoconfigure.amqp.RabbitProperties;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -24,12 +20,10 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.expression.Expression;
 import org.springframework.integration.amqp.dsl.Amqp;
 import org.springframework.integration.amqp.dsl.AmqpOutboundEndpointSpec;
-import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageHandler;
 
 @EnableConfigurationProperties(RabbitSinkProperties.class)
 @Configuration
-@AutoConfigureBefore(RabbitAutoConfiguration.class)
 public class RabbitSinkConfiguration implements DisposableBean {
 
 	@Autowired
@@ -47,21 +41,12 @@ public class RabbitSinkConfiguration implements DisposableBean {
 	private CachingConnectionFactory ownConnectionFactory;
 
 	@Bean
-	public Function<Message<?>, Object> sink(@Qualifier("amqpChannelAdapter") MessageHandler messageHandler) {
-		return o -> {
-			System.out.println("Got the message: " + o);
-			System.out.println("Got:" + messageHandler.getClass().getName());
-			messageHandler.handleMessage(o);
-			return "Message sent to rabbitmq - check the exchange...";
-		};
-	}
-
-	@Bean
-	public MessageHandler amqpChannelAdapter(ConnectionFactory rabbitConnectionFactory) throws Exception {
+	public MessageHandler amqpChannelAdapter(ConnectionFactory rabbitConnectionFactory)
+			throws Exception {
 		System.out.println("In amqpChannelAdapter - FOOBAR-1");
-		AmqpOutboundEndpointSpec handler = Amqp.outboundAdapter(rabbitTemplate(this.properties.isOwnConnection()
-				? buildLocalConnectionFactory()
-				: rabbitConnectionFactory))
+		AmqpOutboundEndpointSpec handler = Amqp
+				.outboundAdapter(rabbitTemplate(this.properties.isOwnConnection()
+						? buildLocalConnectionFactory() : rabbitConnectionFactory))
 				.mappedRequestHeaders(properties.getMappedRequestHeaders())
 				.defaultDeliveryMode(properties.getPersistentDeliveryMode()
 						? MessageDeliveryMode.PERSISTENT
@@ -87,8 +72,8 @@ public class RabbitSinkConfiguration implements DisposableBean {
 	}
 
 	private ConnectionFactory buildLocalConnectionFactory() throws Exception {
-		this.ownConnectionFactory = new AutoConfig.Creator().rabbitConnectionFactory(this.bootProperties,
-				this.connectionNameStrategy);
+		this.ownConnectionFactory = new AutoConfig.Creator().rabbitConnectionFactory(
+				this.bootProperties, this.connectionNameStrategy);
 		return this.ownConnectionFactory;
 	}
 
@@ -103,7 +88,8 @@ public class RabbitSinkConfiguration implements DisposableBean {
 	}
 
 	@Bean
-	@ConditionalOnProperty(name = "rabbit.converterBeanName", havingValue = RabbitSinkProperties.JSON_CONVERTER)
+	@ConditionalOnProperty(name = "rabbit.converterBeanName",
+			havingValue = RabbitSinkProperties.JSON_CONVERTER)
 	public Jackson2JsonMessageConverter jsonConverter() {
 		return new Jackson2JsonMessageConverter();
 	}
@@ -114,6 +100,7 @@ public class RabbitSinkConfiguration implements DisposableBean {
 			this.ownConnectionFactory.destroy();
 		}
 	}
+
 }
 
 class AutoConfig extends RabbitAutoConfiguration {
@@ -122,9 +109,12 @@ class AutoConfig extends RabbitAutoConfiguration {
 
 		@Override
 		public CachingConnectionFactory rabbitConnectionFactory(RabbitProperties config,
-																ObjectProvider<ConnectionNameStrategy> connectionNameStrategy) throws Exception {
-			CachingConnectionFactory cf = super.rabbitConnectionFactory(config, connectionNameStrategy);
-			cf.setConnectionNameStrategy(connectionFactory -> "rabbit.sink.own.connection");
+																ObjectProvider<ConnectionNameStrategy> connectionNameStrategy)
+				throws Exception {
+			CachingConnectionFactory cf = super.rabbitConnectionFactory(config,
+					connectionNameStrategy);
+			cf.setConnectionNameStrategy(
+					connectionFactory -> "rabbit.sink.own.connection");
 			cf.afterPropertiesSet();
 			return cf;
 		}
