@@ -46,15 +46,15 @@ public class RabbitSinkConfiguration implements DisposableBean {
 
 	private CachingConnectionFactory ownConnectionFactory;
 
-	@Bean
-	public Function<Message<?>, Object> sink(@Qualifier("amqpChannelAdapter") MessageHandler messageHandler) {
-		return o -> {
-			System.out.println("Got the message: " + o);
-			System.out.println("Got:" + messageHandler.getClass().getName());
-			messageHandler.handleMessage(o);
-			return "Message sent to rabbitmq - check the exchange...";
-		};
-	}
+//	@Bean
+//	public Function<Message<?>, Object> sink(@Qualifier("amqpChannelAdapter") MessageHandler messageHandler) {
+//		return o -> {
+//			System.out.println("Got the message: " + o);
+//			System.out.println("Got:" + messageHandler.getClass().getName());
+//			messageHandler.handleMessage(o);
+//			return "Message sent to rabbitmq - check the exchange...";
+//		};
+//	}
 
 	@Bean
 	public MessageHandler amqpChannelAdapter(ConnectionFactory rabbitConnectionFactory) throws Exception {
