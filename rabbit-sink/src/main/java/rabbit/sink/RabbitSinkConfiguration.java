@@ -1,5 +1,7 @@
 package rabbit.sink;
 
+import java.util.function.Function;
+
 import org.springframework.amqp.core.MessageDeliveryMode;
 import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
@@ -10,6 +12,7 @@ import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.amqp.RabbitAutoConfiguration;
 import org.springframework.boot.autoconfigure.amqp.RabbitProperties;
@@ -21,6 +24,7 @@ import org.springframework.expression.Expression;
 import org.springframework.integration.amqp.dsl.Amqp;
 import org.springframework.integration.amqp.dsl.AmqpOutboundEndpointSpec;
 import org.springframework.messaging.MessageHandler;
+import org.springframework.messaging.support.MessageBuilder;
 
 @EnableConfigurationProperties(RabbitSinkProperties.class)
 @Configuration
@@ -39,6 +43,17 @@ public class RabbitSinkConfiguration implements DisposableBean {
 	private MessageConverter messageConverter;
 
 	private CachingConnectionFactory ownConnectionFactory;
+
+	@Bean
+	public Function<Object, Object> sink(@Qualifier("amqpChannelAdapter") MessageHandler messageHandler) {
+		return o -> {
+			System.out.println("Got the message: " + o);
+			System.out.println("Got:" + messageHandler.getClass().getName());
+			messageHandler.handleMessage(MessageBuilder.withPayload(o).build());
+			return "Message sent to rabbitmq - check the exchange...";
+		};
+	}
+
 
 	@Bean
 	public MessageHandler amqpChannelAdapter(ConnectionFactory rabbitConnectionFactory)
